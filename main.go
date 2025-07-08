@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,10 +15,10 @@ type Pokemon struct {
 }
 
 var uniqueId int = 1
-var Pokemons []Pokemon
+var pokemons []Pokemon
 
 func getPokemons(context *gin.Context) {
-	context.JSON(http.StatusOK, Pokemons)
+	context.JSON(http.StatusOK, pokemons)
 }
 
 func addPokemon(context *gin.Context) {
@@ -47,20 +48,69 @@ func addPokemon(context *gin.Context) {
 	newPokemon.ID = uniqueId
 	uniqueId++
 
-	Pokemons = append(Pokemons, newPokemon)
+	pokemons = append(pokemons, newPokemon)
 
 	context.JSON(http.StatusCreated, newPokemon)
+
+}
+
+func updatePokemon(context *gin.Context) {
+
+	idParam := context.Param("id")
+	id, err := strconv.Atoi(idParam)
+
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
+
+	var updatedPokemon Pokemon
+	if err := context.BindJSON(&updatedPokemon); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
+		return
+	}
+
+	if updatedPokemon.Name == "" {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Name must be non-empty"})
+		return
+	}
+
+	if updatedPokemon.Type == "" {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Type must be non-empty"})
+		return
+	}
+
+	if updatedPokemon.Level <= 0 {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Level must be > 0"})
+		return
+	}
+
+	for i := range pokemons {
+		if pokemons[i].ID == id {
+			pokemons[i].Name = updatedPokemon.Name
+			pokemons[i].Type = updatedPokemon.Type
+			pokemons[i].Level = updatedPokemon.Level
+
+			context.JSON(http.StatusOK, pokemons[i])
+			return
+		}
+	}
+
+	context.JSON(http.StatusNotFound, gin.H{"error": "Pokemon not found"})
 
 }
 
 func main() {
 	router := gin.Default()
 
-	//GET/pokemons
+	// GET/pokemons
 	router.GET("/pokemons", getPokemons)
 
-	//POST/pokemons using data.json
+	// POST/pokemons using data.json
 	router.POST("/pokemons", addPokemon)
+
+	// PUT/pokemons/id
+	router.PUT("/pokemons/:id", updatePokemon)
 
 	router.Run("localhost:8080")
 }

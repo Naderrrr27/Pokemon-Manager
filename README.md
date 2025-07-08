@@ -1,6 +1,6 @@
 # Pokemon-Manager
 
-This is a tiny web server built with Go and Gin that lets you view and add caught Pokemon — all stored in memory with no database needed.
+This is a tiny web server built with Go and Gin that lets you view, add, and update caught Pokemon — all stored in memory with no database needed.
 
 ---
 
@@ -39,10 +39,10 @@ curl http://localhost:8080/pokemons
 ```json
 [
   {
-  "id": "1",
-  "name": "Omar",
-  "type": "Mentor",
-  "level": "100000"
+    "id": 1,
+    "name": "Pikachu",
+    "type": "IDK",
+    "level": 5
   }
 ]
 ```
@@ -57,33 +57,82 @@ curl http://localhost:8080/pokemons
 **Example:**
 
 ```bash
-curl -X POST http://localhost:8080/pokemons   -H "Content-Type: application/json"   -d @data.json
+curl -X POST http://localhost:8080/pokemons \
+  -H "Content-Type: application/json" \
+  -d @data.json
+```
+
+**Sample `data.json`:**
+
+```json
+{
+  "name": "Pikachu II",
+  "type": "IDC",
+  "level": 4
+}
 ```
 
 **Sample Response:**
 
 ```json
 {
-  "id": "1",
-  "name": "Omar",
-  "type": "Mentor",
-  "level": "100000"
+  "id": 2,
+  "name": "Charmander",
+  "type": "Fire",
+  "level": 7
 }
 ```
 
 ---
 
-## 📝 Notes
+### Update an Existing Pokémon
 
-- You can now **view** and **add** Pokemon.
-- No update, delete, or external API yet.
-- Data is stored in memory, so it resets every time you restart the server.
+**Endpoint:**  
+`PUT /pokemons/{id}`
+
+**Example:**
+
+```bash
+curl -X PUT http://localhost:8080/pokemons/1 \
+  -H "Content-Type: application/json" \
+  -d @data.json
+```
+
+**Sample `data.json`:**
+
+```json
+{
+  "name": "Charmeleon",
+  "type": "Fire",
+  "level": 16
+}
+```
+
+**Sample Response:**
+
+```json
+{
+  "id": 1,
+  "name": "Charmeleon",
+  "type": "Fire",
+  "level": 16
+}
+```
 
 ---
 
-## 🔧 Built With
+## Notes
+
+- You can now **view**, **add**, and **update** Pokémon.
+- No delete or external API support yet.
+- Data is stored in memory, so it resets every time you restart the server.
+- Validation is included: name and type must not be empty, and level must be greater than 0.
+
+---
+
+## Built With
 
 - Go (Golang)
-- Gin (Web Framework)s
+- Gin (Web Framework)
 
 ---
