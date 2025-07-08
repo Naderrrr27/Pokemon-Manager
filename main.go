@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -18,10 +17,18 @@ type Pokemon struct {
 }
 
 var uniqueId int = 1
-var pokemons []Pokemon
+var pokemons = make(map[int]Pokemon)
 
 func getPokemons(context *gin.Context) {
-	context.JSON(http.StatusOK, pokemons)
+
+	returnedPokemons := make([]Pokemon, 0, len(pokemons))
+
+	for _, pokemon := range pokemons {
+		returnedPokemons = append(returnedPokemons, pokemon)
+	}
+
+	context.JSON(http.StatusOK, returnedPokemons)
+
 }
 
 func addPokemon(context *gin.Context) {
@@ -51,7 +58,7 @@ func addPokemon(context *gin.Context) {
 	newPokemon.ID = uniqueId
 	uniqueId++
 
-	pokemons = append(pokemons, newPokemon)
+	pokemons[newPokemon.ID] = newPokemon
 
 	context.JSON(http.StatusCreated, newPokemon)
 
@@ -88,15 +95,12 @@ func updatePokemon(context *gin.Context) {
 		return
 	}
 
-	for i := range pokemons {
-		if pokemons[i].ID == id {
-			pokemons[i].Name = updatedPokemon.Name
-			pokemons[i].Type = updatedPokemon.Type
-			pokemons[i].Level = updatedPokemon.Level
+	if _, exists := pokemons[id]; exists {
+		updatedPokemon.ID = id
+		pokemons[id] = updatedPokemon
 
-			context.JSON(http.StatusOK, pokemons[i])
-			return
-		}
+		context.JSON(http.StatusOK, pokemons[id])
+		return
 	}
 
 	context.JSON(http.StatusNotFound, gin.H{"error": "Pokemon not found"})
@@ -113,13 +117,10 @@ func deletePokemon(context *gin.Context) {
 		return
 	}
 
-	for i := range pokemons {
-		if pokemons[i].ID == id {
-
-			pokemons = append(pokemons[:i], pokemons[i+1:]...)
-			context.JSON(http.StatusOK, gin.H{"Message": "Pokemon released successfully"})
-			return
-		}
+	if _, exists := pokemons[id]; exists == true {
+		delete(pokemons, id)
+		context.JSON(http.StatusOK, gin.H{"Message": "Pokemon released successfully"})
+		return
 	}
 
 	context.JSON(http.StatusNotFound, gin.H{"error": "Pokemon not found in API"})
@@ -127,6 +128,7 @@ func deletePokemon(context *gin.Context) {
 }
 
 func getPokemonInfo(context *gin.Context) {
+
 	name := context.Param("name")
 	response, err := http.Get("https://pokeapi.co/api/v2/pokemon/" + strings.ToLower(name))
 
@@ -164,6 +166,7 @@ func getPokemonInfo(context *gin.Context) {
 		"weight": apiResponse.Weight,
 		"types":  typeNames,
 	})
+
 }
 
 func main() {
