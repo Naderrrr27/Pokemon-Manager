@@ -100,6 +100,29 @@ func updatePokemon(context *gin.Context) {
 
 }
 
+func deletePokemon(context *gin.Context) {
+
+	idParam := context.Param("id")
+	id, err := strconv.Atoi(idParam)
+
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
+
+	for i := range pokemons {
+		if pokemons[i].ID == id {
+
+			pokemons = append(pokemons[:i], pokemons[i+1:]...)
+			context.JSON(http.StatusOK, gin.H{"Message": "Pokemon released successfully"})
+			return
+		}
+	}
+
+	context.JSON(http.StatusNotFound, gin.H{"error": "Pokemon not found in API"})
+
+}
+
 func main() {
 	router := gin.Default()
 
@@ -111,6 +134,9 @@ func main() {
 
 	// PUT/pokemons/id
 	router.PUT("/pokemons/:id", updatePokemon)
+
+	// DELETE/pokemons/id
+	router.DELETE("/pokemons/:id", deletePokemon)
 
 	router.Run("localhost:8080")
 }
