@@ -4,7 +4,7 @@ This is a tiny web server built with Go and Gin that lets you view, add, update,
 
 ---
 
-## 🚀 How to Run It
+## How to Run It
 
 1. Make sure you have Go installed: https://go.dev/dl/
 
