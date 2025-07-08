@@ -1,8 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
+
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -123,6 +126,46 @@ func deletePokemon(context *gin.Context) {
 
 }
 
+func getPokemonInfo(context *gin.Context) {
+	name := context.Param("name")
+	response, err := http.Get("https://pokeapi.co/api/v2/pokemon/" + strings.ToLower(name))
+
+	if err != nil || response.StatusCode != http.StatusOK {
+		context.JSON(http.StatusNotFound, gin.H{"error": "Pokemon not found in API"})
+		return
+	}
+
+	defer response.Body.Close()
+
+	var apiResponse struct {
+		Name   string `json:"name"`
+		Height int    `json:"height"`
+		Weight int    `json:"weight"`
+		Types  []struct {
+			Type struct {
+				Name string `json:"name"`
+			} `json:"type"`
+		} `json:"types"`
+	}
+
+	if err := json.NewDecoder(response.Body).Decode(&apiResponse); err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse API response"})
+		return
+	}
+
+	var typeNames []string
+	for _, t := range apiResponse.Types {
+		typeNames = append(typeNames, t.Type.Name)
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"name":   apiResponse.Name,
+		"height": apiResponse.Height,
+		"weight": apiResponse.Weight,
+		"types":  typeNames,
+	})
+}
+
 func main() {
 	router := gin.Default()
 
@@ -137,6 +180,9 @@ func main() {
 
 	// DELETE/pokemons/id
 	router.DELETE("/pokemons/:id", deletePokemon)
+
+	// GET/pokemon-info/id -> External API EndPoint
+	router.GET("/pokemon-info/:name", getPokemonInfo)
 
 	router.Run("localhost:8080")
 }
