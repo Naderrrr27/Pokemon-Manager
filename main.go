@@ -10,15 +10,16 @@ import (
 )
 
 type Pokemon struct {
-	ID    int    `json:"id"`
-	Name  string `json:"name"`
-	Type  string `json:"type"`
-	Level int    `json:"level"`
+	ID    int    `json:"id"`    // Unique ID assigned by the server
+	Name  string `json:"name"`  // Name of the Pokemon
+	Type  string `json:"type"`  // Type (e.g., Fire, Water)
+	Level int    `json:"level"` // Level (must be > 0)
 }
 
 var uniqueId int = 1
 var pokemons = make(map[int]Pokemon)
 
+// Just converting map values to a slice for JSON response
 func getPokemons(context *gin.Context) {
 
 	returnedPokemons := make([]Pokemon, 0, len(pokemons))
@@ -31,6 +32,7 @@ func getPokemons(context *gin.Context) {
 
 }
 
+// Validate and add a new Pokemon with a unique ID
 func addPokemon(context *gin.Context) {
 
 	var newPokemon Pokemon
@@ -64,6 +66,7 @@ func addPokemon(context *gin.Context) {
 
 }
 
+// Validate and update Pokemon info by ID if it exists
 func updatePokemon(context *gin.Context) {
 
 	idParam := context.Param("id")
@@ -107,6 +110,7 @@ func updatePokemon(context *gin.Context) {
 
 }
 
+// Remove Pokemon from the map if the ID exists
 func deletePokemon(context *gin.Context) {
 
 	idParam := context.Param("id")
@@ -127,6 +131,7 @@ func deletePokemon(context *gin.Context) {
 
 }
 
+// Fetch basic Pokemon info from external PokeAPI by name
 func getPokemonInfo(context *gin.Context) {
 
 	name := context.Param("name")

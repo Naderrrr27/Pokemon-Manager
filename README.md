@@ -1,6 +1,6 @@
 # Pokemon-Manager
 
-This is a tiny web server built with Go and Gin that lets you view, add, update, delete, and get info about caught Pokémon — all stored in memory with no database needed. 
+This is a tiny web server built with Go and Gin that lets you view, add, update, delete, and get info about caught Pokemon — all stored in memory with no database needed. 
 
 It also supports fetching basic data from the external PokeAPI.
 
@@ -26,7 +26,7 @@ The server will start at:
 
 ## What You Can Do
 
-### Get All Pokémons
+### Get All Pokemons
 
 **Endpoint:**  
 `GET /pokemons`
@@ -52,7 +52,7 @@ curl http://localhost:8080/pokemons
 
 ---
 
-### Add a New Pokémon
+### Add a New Pokemon
 
 **Endpoint:**  
 `POST /pokemons`
@@ -88,7 +88,7 @@ curl -X POST http://localhost:8080/pokemons \
 
 ---
 
-### Update an Existing Pokémon
+### Update an Existing Pokemon
 
 **Endpoint:**  
 `PUT /pokemons/{id}`
@@ -124,7 +124,7 @@ curl -X PUT http://localhost:8080/pokemons/1 \
 
 ---
 
-### Delete a Pokémon
+### Delete a Pokemon
 
 **Endpoint:**  
 `DELETE /pokemons/{id}`
@@ -171,7 +171,7 @@ curl http://localhost:8080/pokemon-info/pikachu
 
 ## Notes
 
-- You can now view, add, update, delete, and fetch external info for Pokémon.
+- You can now view, add, update, delete, and fetch external info for Pokemon.
 - Data is stored in memory, so it resets every time you restart the server.
 - Basic validation is included.
 
